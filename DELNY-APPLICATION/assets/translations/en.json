@@ -1,0 +1,20 @@
+ {
+  "welcome_title": "Welcome to Dlny App",
+  "welcome_desc": "Find trusted craftsmen and engineers anytime, anywhere.",
+  "best_title": "Best Services",
+  "best_desc": "We offer you a wide range of services to help you get your work done efficiently and with high quality.",
+  "start_title": "Start Now",
+  "start_desc": "Join us today and enjoy a smooth and comfortable experience every step of the way.",
+  "continue": "Continue",
+  "get_started": "Get Started",
+  "sign_in": "Sign In",
+  "login": "Login",
+  "username": "Username",
+  "enter_id": "Enter Your Id",
+  "email": "Email",
+  "enter_email": "Enter Your Email",
+  "password": "Password",
+  "enter_password": "Enter Your Password",
+  "signup": "Sign Up",
+  "already_account": "Already have an account?"
+}
