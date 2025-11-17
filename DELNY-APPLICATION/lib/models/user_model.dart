@@ -9,6 +9,7 @@ class UserModel {
   final bool isServiceProvider;
   final List<String> favorites;
 
+  //إنشاء كائن مستخدم جديد.
   UserModel({
     required this.uid,
     required this.name,
@@ -21,6 +22,7 @@ class UserModel {
     this.favorites = const [],
   });
 
+  //تحويل بيانات Firestore إلى كائن UserModel محليًا.
   factory UserModel.fromMap(Map<String, dynamic> map, String uid) {
     return UserModel(
       uid: uid,
@@ -35,6 +37,7 @@ class UserModel {
     );
   }
 
+  //تحويل UserModel إلى خريطة لإرسالها إلى Firestore.
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -48,6 +51,10 @@ class UserModel {
     };
   }
 
+
+
+  //تعديل بعض الحقول بال profile page (بنستخدمها امع ال provider)
+  //كل المعلومات ممكن تتغير ما عدا ال favorate
   UserModel copyWith({
     String? name,
     String? phone,

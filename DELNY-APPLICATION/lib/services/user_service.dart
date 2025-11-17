@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
-
+ 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+ 
   // جلب بيانات المستخدم
   Future<UserModel?> getUserData(String userId) async {
     try {
@@ -17,7 +17,7 @@ class UserService {
       return null;
     }
   }
-
+ 
   // تحديث بيانات المستخدم
   Future<void> updateUserData(String userId, Map<String, dynamic> data) async {
     try {
@@ -27,13 +27,13 @@ class UserService {
       rethrow;
     }
   }
-
+ 
   // إضافة/إزالة من المفضلة
   Future<void> toggleFavorite(String userId, String targetUid) async {
     try {
       final userDoc = _firestore.collection('users').doc(userId);
       final user = await getUserData(userId);
-
+ 
       if (user?.favorites.contains(targetUid) ?? false) {
         await userDoc.update({
           'favorites': FieldValue.arrayRemove([targetUid])
@@ -48,8 +48,8 @@ class UserService {
       rethrow;
     }
   }
-
-  // جلب الحرفيين حسب المهنة
+ 
+  // جلب الحرفيين حسب المهنة (stream لتحديث البيانات لحظة بلحظة)
   Stream<List<UserModel>> getUsersByCareer(String career) {
     return _firestore
         .collection('users')
@@ -57,20 +57,20 @@ class UserService {
         .where('isServiceProvider', isEqualTo: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
-        .map((doc) => UserModel.fromMap(doc.data(), doc.id))
-        .toList());
+            .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+            .toList());
   }
-
+ 
   // جلب المستخدمين المفضلين
   Future<List<UserModel>> getFavoriteUsers(List<String> favoriteIds) async {
     if (favoriteIds.isEmpty) return [];
-
+ 
     try {
       final snapshot = await _firestore
           .collection('users')
           .where(FieldPath.documentId, whereIn: favoriteIds)
           .get();
-
+ 
       return snapshot.docs
           .map((doc) => UserModel.fromMap(doc.data(), doc.id))
           .toList();
@@ -79,7 +79,7 @@ class UserService {
       return [];
     }
   }
-
+ 
   // ستريم المفضلة
   Stream<List<String>> getUserFavoritesStream(String userId) {
     return _firestore

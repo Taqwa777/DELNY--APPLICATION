@@ -1,45 +1,42 @@
+import 'package:final_project_dlny/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
+import '../../services/user_service.dart';
 import '../common/user_detail_page.dart';
-
+ 
 class PlumbingPage extends StatelessWidget {
   const PlumbingPage({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UserProvider>();
-
+    final userService = UserService();
+ 
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Plumbers"),
-          backgroundColor: const Color(0xFFFB5E10)
+        title: const Text("Plumbers"),
+        backgroundColor: const Color(0xFFFB5E10),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('career', isEqualTo: 'Plumbing')
-            .where('isServiceProvider', isEqualTo: true)
-            .snapshots(),
+      body: StreamBuilder<List<UserModel>>(
+        stream: userService.getUsersByCareer('Plumbing'),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("No plumbers available"));
           }
-
-          final users = snapshot.data!.docs;
-
+ 
+          final users = snapshot.data!;
+ 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: users.length,
             itemBuilder: (context, index) {
-              final user = users[index].data() as Map<String, dynamic>;
-              user['uid'] = users[index].id;
-              final isFav = provider.isFavorite(user['uid']);
-
+              final user = users[index];
+              final isFav = provider.isFavorite(user.uid);
+ 
               return _buildUserCard(user, isFav, provider, context);
             },
           );
@@ -47,17 +44,16 @@ class PlumbingPage extends StatelessWidget {
       ),
     );
   }
-
+ 
   Widget _buildUserCard(
-      Map<String, dynamic> user,
+      UserModel user,
       bool isFav,
       UserProvider provider,
-      BuildContext context
-      ) {
+      BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => UserDetailPage(user: user)),
+        MaterialPageRoute(builder: (_) => UserDetailPage(user: user.toMap())),
       ),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -71,14 +67,14 @@ class PlumbingPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("👤 ${user['name']}",
+                    Text("👤 ${user.name}",
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
-                    Text("📞 ${user['phone']}", style: const TextStyle(fontSize: 16)),
+                    Text("📞 ${user.phone ?? '-'}", style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 6),
-                    Text("📍 ${user['location']}", style: const TextStyle(fontSize: 16)),
+                    Text("📍 ${user.location ?? '-'}", style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 6),
-                    Text("💼 ${user['experience']} years", style: const TextStyle(fontSize: 16)),
+                    Text("💼 ${user.experience ?? '0'} years", style: const TextStyle(fontSize: 16)),
                   ],
                 ),
               ),
@@ -87,7 +83,7 @@ class PlumbingPage extends StatelessWidget {
                   isFav ? Icons.favorite : Icons.favorite_border,
                   color: isFav ? Colors.red : Colors.grey,
                 ),
-                onPressed: () => provider.toggleFavorite(user['uid']),
+                onPressed: () => provider.toggleFavorite(user.uid),
               ),
             ],
           ),
